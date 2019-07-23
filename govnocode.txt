@@ -1,0 +1,56 @@
+#include "pch.h"
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL, "rus");
+	char input[33];
+	int iinput[32];
+	int crc = 32773;//полином x^16 + x^15 + x^2 + 1
+	int bcrc[16];
+	int shift = 0;
+	for (int i = 15; i >= 0; i--) // переводим 32773 в двоичную
+	{
+		if (crc % 2 == 1)
+		{
+			bcrc[i] = 1;
+		}
+		else {
+			bcrc[i] = 0;
+		}
+		crc /= 2;
+	}
+
+	cout << "Введите исходные данные" << endl;
+	cin.get(input, 33); // считываем в массив
+
+	for (int i = 0; i < 16; i++)
+	{
+		iinput[i] = input[i]; // после чара в иинте лежат коды аски 48 - 0, 49 - 1
+		iinput[i] -= 48; // минусуем чтобы вместо 48 был 0, вместо 49 - 1
+	}
+	for (int i = 15; i < 32; i++)
+	{
+		iinput[i] = 0; //добавляем 16 нулей ко входному значению
+	}
+	while (true) {
+		if (iinput[shift]==1) {//проверка является ли первый бит нулевым, если да, смотрим следующий
+			for (int i = 0; i < 16; i++) {
+				iinput[i + shift] = iinput[i + shift] ^ bcrc[i];//исключающее или исходного и полинома
+			}
+			shift++;
+		}else {
+			shift++;
+			if (shift > 15) {//смотрим чтобы не сдвинул больше чем надо
+			break;
+			}
+		}
+		
+	}
+	cout << "Crc is: ";//выводим результат
+	for (int i = 16; i < 32; i++)
+	{
+		cout << iinput[i];
+	}
+}
